@@ -16,6 +16,7 @@ steps:
   displayName: 'bundle install'
 
 - script: bundle exec fastlane test
+  continueOnError: true
   displayName: 'fastlane test'
 
 - task: PublishTestResults@2
