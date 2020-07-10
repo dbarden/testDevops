@@ -17,3 +17,8 @@ steps:
 
 - script: bundle exec fastlane test
   displayName: 'fastlane test'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/fastlane/test_output/report.junit'
