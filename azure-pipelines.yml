@@ -22,4 +22,5 @@ steps:
 - task: PublishTestResults@2
   inputs:
     testResultsFormat: 'JUnit'
+    failTaskOnFailedTests: true
     testResultsFiles: './fastlane/test_output/report.junit'
