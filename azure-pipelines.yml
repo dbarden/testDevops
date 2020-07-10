@@ -10,7 +10,20 @@ pool:
   vmImage: 'macos-latest'
 
 stages:
+  - stage: prepare_environment
+    jobs:
+      - job: prepare_environment
+        steps:
+          - script: |
+              CALL gem install bundler
+              bundle install --retry=3 --jobs=4
+            displayName: 'bundle install'
+
+          - script: bundle exec pod install
+            displayName: 'Installing pods'
+  
   - stage: swiftlint
+    dependsOn: prepare_environment
     jobs:
       - job: swiftlint
         steps:
@@ -20,16 +33,6 @@ stages:
   - stage: unit_tests
     dependsOn: swiftlint
     jobs:
-      - job: prepare_environment
-        steps:
-          - script: |
-              gem install bundler
-              bundle install --retry=3 --jobs=4
-            displayName: 'bundle install'
-
-          - script: bundle exec pod install
-            displayName: 'Installing pods'
-
       - job: build_app
         steps:
           - script: bundle exec fastlane build_for_tests
