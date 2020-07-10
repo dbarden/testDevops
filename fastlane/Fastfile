@@ -4,6 +4,13 @@ DERIVED_DATA_PATH = "DerivedData"
 platform :ios do
   desc "Description of what the lane does"
 
+  lane :lint do
+    swiftlint(
+      executable: "./Pods/SwiftLint/swiftlint",
+      strict: true
+    )
+  end
+
   lane :build_for_tests do
     scan(
       derived_data_path: DERIVED_DATA_PATH,
