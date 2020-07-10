@@ -10,15 +10,7 @@ pool:
   vmImage: 'macos-latest'
 
 stages:
-  - stage: swiftlint
-    jobs:
-      - job: swiftlint
-        steps:
-          - script: bundle exec fastlane line
-            displayName: 'Running SwiftLint'
-
-  - stage: unit_tests
-    dependsOn: swiftlint
+  - stage: prepare_environment
     jobs:
       - job: prepare_environment
         steps:
@@ -29,7 +21,18 @@ stages:
 
           - script: bundle exec pod install
             displayName: 'Installing pods'
+  
+  - stage: swiftlint
+    dependsOn: prepare_environment
+    jobs:
+      - job: swiftlint
+        steps:
+          - script: bundle exec fastlane line
+            displayName: 'Running SwiftLint'
 
+  - stage: unit_tests
+    dependsOn: swiftlint
+    jobs:
       - job: build_app
         steps:
           - script: bundle exec fastlane build_for_tests
