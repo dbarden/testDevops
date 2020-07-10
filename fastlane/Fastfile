@@ -18,7 +18,7 @@ platform :ios do
     )
   end
 
-  lane :run_test do
+  lane :run_tests do
     scan(
       derived_data_path: DERIVED_DATA_PATH,
       test_without_building: true
