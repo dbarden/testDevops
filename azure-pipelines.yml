@@ -23,7 +23,7 @@ stages:
       - job: prepare_environment
         steps:
           - script: |
-              gem install bundler
+              CALL gem install bundler
               bundle install --retry=3 --jobs=4
             displayName: 'bundle install'
 
