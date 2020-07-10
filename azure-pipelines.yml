@@ -9,29 +9,21 @@ trigger:
 pool:
   vmImage: 'macos-latest'
 
-jobs:
-  - job: prepare_environment
+jobs: 
+  - job:
     steps:
-      - script: |
-          CALL gem install bundler
-          bundle install --retry=3 --jobs=4
+      - script: bundle install 
         displayName: 'bundle install'
        
       - script: bundle exec pod install
         displayName: 'Installing pods'
   
-  - job: swiftlint
-    steps:
-      - script: bundle exec fastlane line
+      - script: bundle exec fastlane lint
         displayName: 'Running SwiftLint'
 
-  - job: build_app
-    steps:
       - script: bundle exec fastlane build_for_tests
         displayName: 'Building for tests'
 
-  - job: run_tests
-    steps:
       - script: bundle exec fastlane run_tests
         continueOnError: true
         displayName: 'Running tests'
