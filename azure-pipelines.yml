@@ -11,6 +11,7 @@ pool:
 
 jobs: 
   - job:
+    displayName: "Swiftlint & Unit Tests"
     steps:
       - script: bundle install 
         displayName: 'bundle install'
