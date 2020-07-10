@@ -9,18 +9,40 @@ trigger:
 pool:
   vmImage: 'macos-latest'
 
-steps:
-- script: |
-    CALL gem install bundler
-    bundle install --retry=3 --jobs=4
-  displayName: 'bundle install'
+stages:
+  - stage: swiftlint
+    jobs:
+      - job: swiftlint
+        steps:
+          - script: bundle exec fastlane line
+            displayName: 'Running SwiftLint'
 
-- script: bundle exec fastlane test
-  continueOnError: true
-  displayName: 'fastlane test'
+  - stage: unit_tests
+    dependsOn: swiftlint
+    jobs:
+      - job: prepare_environment
+        steps:
+          - script: |
+              gem install bundler
+              bundle install --retry=3 --jobs=4
+            displayName: 'bundle install'
 
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'JUnit'
-    failTaskOnFailedTests: true
-    testResultsFiles: './fastlane/test_output/report.junit'
+          - script: bundle exec pod install
+            displayName: 'Installing pods'
+
+      - job: build_app
+        steps:
+          - script: bundle exec fastlane build_for_tests
+            displayName: 'Building for tests'
+
+      - job: run_tests
+        steps:
+          - script: bundle exec fastlane run_tests
+            continueOnError: true
+            displayName: 'Running tests'
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              failTaskOnFailedTests: true
+              testResultsFiles: './fastlane/test_output/report.junit'
