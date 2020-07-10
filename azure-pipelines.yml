@@ -9,6 +9,7 @@ trigger:
 pool:
   vmImage: 'macos-latest'
 
+<<<<<<< HEAD
 stages:
   - stage: swiftlint
     jobs:
@@ -46,3 +47,33 @@ stages:
               testResultsFormat: 'JUnit'
               failTaskOnFailedTests: true
               testResultsFiles: './fastlane/test_output/report.junit'
+=======
+jobs:
+- job: swiftlint
+  steps:
+  - script: bundle exec fastlane line
+    displayName: 'Running SwiftLint'
+
+- job: unit_tests
+  steps:
+  - script: |
+      CALL gem install bundler
+      bundle install --retry=3 --jobs=4
+    displayName: 'bundle install'
+
+  - script: bundle exec pod install
+    displayName: 'Installing pods'
+
+  - script: bundle exec fastlane build_for_tests
+    displayName: 'Building for tests'
+
+  - script: bundle exec fastlane run_tests
+    continueOnError: true
+    displayName: 'Running tests'
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      failTaskOnFailedTests: true
+      testResultsFiles: './fastlane/test_output/report.junit'
+>>>>>>> 469c986... Fix jobs names
