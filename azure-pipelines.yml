@@ -9,43 +9,35 @@ trigger:
 pool:
   vmImage: 'macos-latest'
 
-stages:
-  - stage: prepare_environment
-    jobs:
-      - job: prepare_environment
-        steps:
-          - script: |
-              CALL gem install bundler
-              bundle install --retry=3 --jobs=4
-            displayName: 'bundle install'
-
-          - script: bundle exec pod install
-            displayName: 'Installing pods'
+jobs:
+  - job: prepare_environment
+    steps:
+      - script: |
+          CALL gem install bundler
+          bundle install --retry=3 --jobs=4
+        displayName: 'bundle install'
+       
+      - script: bundle exec pod install
+        displayName: 'Installing pods'
   
-  - stage: swiftlint
-    dependsOn: prepare_environment
-    jobs:
-      - job: swiftlint
-        steps:
-          - script: bundle exec fastlane line
-            displayName: 'Running SwiftLint'
+  - job: swiftlint
+    steps:
+      - script: bundle exec fastlane line
+        displayName: 'Running SwiftLint'
 
-  - stage: unit_tests
-    dependsOn: swiftlint
-    jobs:
-      - job: build_app
-        steps:
-          - script: bundle exec fastlane build_for_tests
-            displayName: 'Building for tests'
+  - job: build_app
+    steps:
+      - script: bundle exec fastlane build_for_tests
+        displayName: 'Building for tests'
 
-      - job: run_tests
-        steps:
-          - script: bundle exec fastlane run_tests
-            continueOnError: true
-            displayName: 'Running tests'
+  - job: run_tests
+    steps:
+      - script: bundle exec fastlane run_tests
+        continueOnError: true
+        displayName: 'Running tests'
 
-          - task: PublishTestResults@2
-            inputs:
-              testResultsFormat: 'JUnit'
-              failTaskOnFailedTests: true
-              testResultsFiles: './fastlane/test_output/report.junit'
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: 'JUnit'
+          failTaskOnFailedTests: true
+          testResultsFiles: './fastlane/test_output/report.junit'
